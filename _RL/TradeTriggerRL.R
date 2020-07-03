@@ -34,32 +34,32 @@ library(magrittr)
 # Used Functions (to make code more compact). See detail of each function in the repository
 #-----------------
 # *** make sure to customize this path
-source("C:/Users/fxtrams/Documents/000_TradingRepo/R_tradecontrol/import_data.R") 
-source("C:/Users/fxtrams/Documents/000_TradingRepo/R_tradecontrol/_RL/generate_RL_policy.R")
-source("C:/Users/fxtrams/Documents/000_TradingRepo/R_tradecontrol/_RL/record_policy.R")
-source("C:/Users/fxtrams/Documents/000_TradingRepo/R_tradecontrol/writeCommandViaCSV.R")
+source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/import_data.R") 
+source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/_RL/generate_RL_policy.R")
+source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/_RL/record_policy.R")
+source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/writeCommandViaCSV.R")
 
  
 # -------------------------
 # Define terminals path addresses, from where we are going to read/write data
 # -------------------------
 # terminal 1 path *** make sure to customize this path
-path_T1 <- "C:/Program Files (x86)/FxPro - Terminal1/MQL4/Files/"
+path_T1 <- "C:/Program Files (x86)/MetaTrader - AxiTrader - Term1/MQL4/Files/"
 
 # terminal 3 path *** make sure to customize this path
-path_T3 <- "C:/Program Files (x86)/FxPro - Terminal3/MQL4/Files/"
+path_T3 <- "C:/Program Files (x86)/MetaTrader - AxiTrader - Term3/MQL4/Files/"
 
 # path where to read control parameters from
-path_control_files = "C:/Users/fxtrams/Documents/000_TradingRepo/R_tradecontrol/_RL/control"
+path_control_files = "C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/_RL/control"
 
 # -------------------------
 # read data from trades in terminal 1
 # -------------------------
 # uncomment code below to test functionality without MT4 platform installed
-# DFT1 <- try(import_data(trade_log_file = "_TEST_DATA/OrdersResultsT1.csv",
-#                         demo_mode = T),
-#             silent = TRUE)
-DFT1 <- try(import_data(path_T1, "OrdersResultsT1.csv"), silent = TRUE)
+DFT1 <- try(import_data(trade_log_file = "_TEST_DATA/OrdersResultsT1.csv", 
+                        demo_mode = T), 
+            silent = TRUE)
+#DFT1 <- try(import_data(path_T1, "OrdersResultsT1.csv"), silent = TRUE)
 # -------------------------
 # read data from trades in terminal 3
 # -------------------------
@@ -80,7 +80,7 @@ for (i in 1:length(vector_systems)) {
   # tryCatch() function will not abort the entire for loop in case of the error in one iteration
   tryCatch({
     # execute this code below for debugging:
-    # i <- 17 #policy off
+    # i <- 7 #policy off
     # i <- 2 #policy on
     
     # extract current magic number id
@@ -103,7 +103,7 @@ for (i in 1:length(vector_systems)) {
   # epsilon - sampling rate    0.1 <- high sample| low sample  -> 0.9
   # iter 
   # ----- 
-  #control <- list(alpha = 0.3, gamma = 0.6, epsilon = 0.1)
+  control <- list(alpha = 0.3, gamma = 0.6, epsilon = 0.1)
   # check existence of the file with control parameters, go to next if not exists
   if(!file.exists(paste0(path_control_files,"/", trading_system, ".rds"))) { next }
   # Use optimal control parameters found by auxiliary function
