@@ -132,7 +132,7 @@ if(file.exists(file.path(path_T3, "01_MacroeconomicEvent.csv"))){
       DFT1 %>%
         group_by(MagicNumber) %>% select(MagicNumber) %>% mutate(IsEnabled = 1) %>% 
         # write commands to disable systems
-        writeCommandViaCSV(path_T3)}
+        writeCommandViaCSV(path_T1)}
    
   }
   
