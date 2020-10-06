@@ -29,27 +29,27 @@ library(lubridate) #install.packages("lubridate")
 # Used Functions
 #-----------------
 # *** make sure to customize this path
-source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/import_data.R")
-source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/get_profit_factorDF.R")
-source("C:/Users/Kris/Documents/GitHub/LazyTrade/R_tradecontrol/writeCommandViaCSV.R")
+source("C:/Users/Kris/Documents/GitHub/KVL/KVL_Trading/R_tradecontrol/import_data.R")
+source("C:/Users/Kris/Documents/GitHub/KVL/KVL_Trading/R_tradecontrol/get_profit_factorDF.R")
+source("C:/Users/Kris/Documents/GitHub/KVL/KVL_Trading/R_tradecontrol/writeCommandViaCSV.R")
 
 # -------------------------
 # Define terminals path addresses, from where we are going to read/write data
 # -------------------------
 # terminal 1 path *** make sure to customize this path
-path_T1 <- "C:/Program Files (x86)/MetaTrader - AxiTrader - Term1/MQL4/Files/"
+path_T3 <- "C:/Program Files (x86)/MT4_Terminal_3/MQL4/Files/"
 # terminal 3 path *** make sure to customize this path
-path_T3 <- "C:/Program Files (x86)/MetaTrader - AxiTrader - Term3/MQL4/Files/"
+path_T4 <- "C:/Program Files (x86)/MT4_Terminal_4/MQL4/Files/"
 
 # -------------------------
 # read data from trades in terminal 1
 # -------------------------
 # # uncomment code below to test functionality without MT4 platform installed
-DFT1 <- try(import_data(trade_log_file = "_TEST_DATA/OrdersResultsT1.csv",
-                         demo_mode = T),
-             silent = TRUE)
+#DFT1 <- try(import_data(trade_log_file = "_TEST_DATA/OrdersResultsT1.csv",
+#                         demo_mode = T),
+#             silent = TRUE)
 
-DFT1 <- try(import_data(path_T1, "OrdersResultsT1.csv"),silent = TRUE)
+DFT1 <- try(import_data(path_T3, "OrdersResultsT3.csv"),silent = TRUE)
 
 
 # get last 10 trades for each Magic system and arrange orders to have descending order
@@ -69,36 +69,36 @@ DFT1_L %>%
   select(MagicNumber) %>%
   mutate(IsEnabled = 1) %>% 
   # Write command "allow"
-  writeCommandViaCSV(path_T1)
+  writeCommandViaCSV(path_T3)
 
-#### DECIDE IF TRADING ON THE T3 ACCOUNT #### -----------------------------
-# Last 10 orders on DEMO && pr.fact >= 2 start trade T3
+#### DECIDE IF TRADING ON THE T4 ACCOUNT #### -----------------------------
+# Last 10 orders on DEMO && pr.fact >= 2 start trade T4
 DFT1_L %>%
   get_profit_factorDF(10) %>% 
   ungroup() %>% 
   filter(PrFact >= 2) %>% 
   select(MagicNumber) %>% 
-  mutate(MagicNumber = MagicNumber + 200, IsEnabled = 1) %>% 
+  mutate(MagicNumber = MagicNumber + 100, IsEnabled = 1) %>% 
   # Write command "allow"
-  writeCommandViaCSV(path_T3)
+  writeCommandViaCSV(path_T4)
 
-#### DECIDE IF NOT TO TRADING ON THE T3 ACCOUNT #### -----------------------------
-# 4. Last 10 orders on DEMO && pr.fact < 1.6 stop trade T3
+#### DECIDE IF NOT TO TRADING ON THE T4 ACCOUNT #### -----------------------------
+# 4. Last 10 orders on DEMO && pr.fact < 1.6 stop trade T4
 DFT1_L %>%
   get_profit_factorDF(10) %>% 
   ungroup() %>% 
   filter(PrFact < 1.6) %>% 
   select(MagicNumber) %>% 
-  mutate(MagicNumber = MagicNumber + 200, IsEnabled = 0) %>% 
+  mutate(MagicNumber = MagicNumber + 100, IsEnabled = 0) %>% 
   # Write command "allow"
-  writeCommandViaCSV(path_T3)
+  writeCommandViaCSV(path_T4)
 
 #write_rds(DFT1_L, "test_data_profit_factorDF.rds")
 ##========================================
 # -------------------------
-# read data from trades in terminal 3
+# read data from trades in terminal 4
 # -------------------------
-DFT3 <- try(import_data(path_T3, "OrdersResultsT3.csv"),silent = TRUE)
+DFT3 <- try(import_data(path_T4, "OrdersResultsT4.csv"),silent = TRUE)
 
 # -------------------------
 # stopping all systems when macroeconomic event is present
@@ -109,19 +109,19 @@ DFT3 <- try(import_data(path_T3, "OrdersResultsT3.csv"),silent = TRUE)
 # stopping all systems when macroeconomic event is present
 # this will be covered in the Course #5 of the Lazy Trading Series!
 # -------------------------
-if(file.exists(file.path(path_T1, "01_MacroeconomicEvent.csv"))){
-  DF_NT <- read_csv(file= file.path(path_T1, "01_MacroeconomicEvent.csv"), col_types = "i")
+if(file.exists(file.path(path_T3, "01_MacroeconomicEvent.csv"))){
+  DF_NT <- read_csv(file= file.path(path_T3, "01_MacroeconomicEvent.csv"), col_types = "i")
   if(DF_NT[1,1] == 1) {
     # disable trades
     if(!class(DFT1)[1]=='try-error'){
       DFT1 %>%
         group_by(MagicNumber) %>% select(MagicNumber) %>% mutate(IsEnabled = 0) %>% 
         # write commands to disable systems
-        writeCommandViaCSV(path_T1)}
+        writeCommandViaCSV(path_T3)}
     if(!class(DFT3)[1]=='try-error'){
       DFT3 %>%
         group_by(MagicNumber) %>% select(MagicNumber) %>% mutate(IsEnabled = 0) %>% 
-        writeCommandViaCSV(path_T3)}
+        writeCommandViaCSV(path_T4)}
     
     
   }
@@ -132,7 +132,7 @@ if(file.exists(file.path(path_T1, "01_MacroeconomicEvent.csv"))){
       DFT1 %>%
         group_by(MagicNumber) %>% select(MagicNumber) %>% mutate(IsEnabled = 1) %>% 
         # write commands to disable systems
-        writeCommandViaCSV(path_T1)}
+        writeCommandViaCSV(path_T3)}
    
   }
   
